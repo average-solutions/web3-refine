@@ -2,15 +2,26 @@
 
 Personal Chrome extension that adds power-user tooling to web3 explorers.
 
-Today it does one thing: on a Blockscout transaction page it injects links that open the
-same transaction in **Tenderly**, **Dedaub** and **Phalcon**.
+## Features
+
+| Feature | What it does |
+|---|---|
+| Transaction tool links | On a transaction page, adds `Open in` links that reopen the same transaction in **Tenderly**, **Dedaub** and **Phalcon**. Only tools that actually index the chain are offered, so there are no dead links; on a chain none of them cover, nothing is injected. |
 
 ```
 Transaction details   Open in  ( Tenderly ) ( Dedaub ) ( Phalcon )
 ```
 
-Links only appear for tools that actually index the chain you are looking at, so there are
-no dead links. On a chain none of the three cover, nothing is injected at all.
+## Supported explorers
+
+Any Blockscout frontend. The chain is detected at runtime, so a host does not need to be
+known ahead of time — only listed in `content_scripts.matches` so Chrome injects there.
+
+| Host | Covers |
+|---|---|
+| `*.blockscout.com` | ~50 public instances, mainnets and testnets |
+| `explorer.optimism.io` | OP Mainnet (10) — `optimism.blockscout.com` redirects here |
+| `gnosisscan.io` | Gnosis (100) — `gnosis.blockscout.com` redirects here |
 
 ## Install
 
@@ -31,8 +42,8 @@ request, which needs none.
 
 ## How it works
 
-`src/content/blockscout.ts` runs on `https://*.blockscout.com/*` and, for each transaction
-page, resolves the chain id and asks every tool for a URL.
+`src/content/blockscout.ts` runs on the hosts listed above and, for each transaction page,
+resolves the chain id and asks every tool for a URL.
 
 **Getting the transaction hash.** From `location.pathname` only — Blockscout's route is
 `/tx/[hash]` and its tabs are query parameters (`?tab=logs`), never extra path segments.
@@ -93,8 +104,10 @@ After a rebuild, press the reload button on the extension card in `chrome://exte
 
 ## Known limitations
 
-- Only `*.blockscout.com` hosts match. Blockscout deployments on their own domains
-  (`explorer.optimism.io`, `gnosisscan.io`) are not covered; adding one is a single entry in
-  `content_scripts.matches` in `src/manifest.json`, and chain detection already works there.
+- Only Blockscout-based explorers are supported. Etherscan and its family use a different
+  DOM and expose no `/assets/envs.js`, so both the placement anchors and chain detection
+  would need their own implementation.
+- A Blockscout instance on a host not in `content_scripts.matches` gets nothing. Adding one
+  is a single entry in `src/manifest.json`; chain detection already works there.
 - Chain tables are snapshots, dated in each tool file. All three vendors add chains without
   notice; refresh from the cited sources when something new is missing.
