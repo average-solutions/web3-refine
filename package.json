@@ -1,0 +1,19 @@
+{
+  "name": "web3-refine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Personal Chrome extension that adds power-user tooling to web3 explorers.",
+  "type": "module",
+  "scripts": {
+    "build": "bun run scripts/build.ts",
+    "watch": "bun run scripts/build.ts --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "check": "bun run typecheck && bun test && bun run build"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.0",
+    "@types/chrome": "^0.0.287",
+    "typescript": "^5.7.2"
+  }
+}

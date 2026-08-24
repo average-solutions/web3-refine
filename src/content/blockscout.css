@@ -1,0 +1,67 @@
+/**
+ * Styles for the injected transaction-tools bar.
+ *
+ * Every selector is scoped under `#web3-refine-tx-tools` so nothing leaks into
+ * the host page. Dark mode keys off `html.dark`, which Blockscout's own theme
+ * toggle sets; `prefers-color-scheme` would disagree with that toggle.
+ */
+
+#web3-refine-tx-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  /* Inherit Blockscout's Inter stack rather than pinning a font. */
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/*
+ * Beside the page title there is nothing to do: that row is a centred flex
+ * container that spaces its own children. The fallback placement lands on a
+ * row of its own, right above the tab strip, and has to separate itself.
+ */
+#web3-refine-tx-tools[data-anchor="tablist"] {
+  margin-bottom: 12px;
+}
+
+#web3-refine-tx-tools .web3-refine-caption {
+  color: #718096;
+  font-weight: 500;
+}
+
+#web3-refine-tx-tools .web3-refine-link {
+  padding: 3px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  background: #f5f7f9;
+  color: #2d3748;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+#web3-refine-tx-tools .web3-refine-link:hover {
+  border-color: #a0aec0;
+  background: #e9edf1;
+}
+
+#web3-refine-tx-tools .web3-refine-link:focus-visible {
+  outline: 2px solid #4299e1;
+  outline-offset: 2px;
+}
+
+html.dark #web3-refine-tx-tools .web3-refine-caption {
+  color: #8b95a5;
+}
+
+html.dark #web3-refine-tx-tools .web3-refine-link {
+  border-color: #2f3947;
+  background: #232b36;
+  color: #e2e8f0;
+}
+
+html.dark #web3-refine-tx-tools .web3-refine-link:hover {
+  border-color: #4a5568;
+  background: #2c3542;
+}
