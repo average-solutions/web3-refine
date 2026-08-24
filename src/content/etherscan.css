@@ -1,0 +1,23 @@
+/**
+ * Styles for the USD figure appended to the `Txn Fee` column.
+ *
+ * Every selector is scoped under `.web3-refine-fee-usd` so nothing leaks into
+ * the host page. Dark mode keys off `html[data-bs-theme="dark"]`, which
+ * Etherscan's own theme toggle sets; `prefers-color-scheme` would disagree with
+ * that toggle.
+ */
+
+.web3-refine-fee-usd {
+  /* The cell is `small text-muted`; inherit its metrics instead of pinning any. */
+  font: inherit;
+  /* A shade firmer than the cell's muted grey, so the figure reads as data
+     without competing with the fee it annotates. */
+  color: #56606a;
+  font-weight: 500;
+  /* The column is narrow, and a figure broken across lines is unreadable. */
+  white-space: nowrap;
+}
+
+html[data-bs-theme="dark"] .web3-refine-fee-usd {
+  color: #a7b1bc;
+}

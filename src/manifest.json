@@ -14,10 +14,45 @@
       "matches": [
         "https://*.blockscout.com/*",
         "https://explorer.optimism.io/*",
-        "https://gnosisscan.io/*"
+        "https://gnosisscan.io/*",
+        "https://scrollscan.com/*"
       ],
       "js": ["content/blockscout.js"],
       "css": ["content/blockscout.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://*.etherscan.io/*",
+        "https://*.bscscan.com/*",
+        "https://*.polygonscan.com/*",
+        "https://*.basescan.org/*",
+        "https://*.arbiscan.io/*",
+        "https://*.lineascan.build/*",
+        "https://*.blastscan.io/*",
+        "https://*.snowscan.xyz/*",
+        "https://*.bttcscan.com/*",
+        "https://*.celoscan.io/*",
+        "https://*.fraxscan.com/*",
+        "https://*.mantlescan.xyz/*",
+        "https://*.sonicscan.org/*",
+        "https://*.uniscan.xyz/*",
+        "https://*.abscan.org/*",
+        "https://*.berascan.com/*",
+        "https://*.worldscan.org/*",
+        "https://*.apescan.io/*",
+        "https://*.taikoscan.io/*",
+        "https://*.xdcscan.com/*",
+        "https://*.monadscan.com/*",
+        "https://*.hyperevmscan.io/*",
+        "https://*.katanascan.com/*",
+        "https://*.seiscan.io/*",
+        "https://*.stablescan.xyz/*",
+        "https://*.plasmascan.to/*",
+        "https://*.memecorescan.io/*"
+      ],
+      "js": ["content/etherscan.js"],
+      "css": ["content/etherscan.css"],
       "run_at": "document_idle"
     }
   ]

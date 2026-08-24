@@ -1,27 +1,47 @@
 # web3-refine
 
-Personal Chrome extension that adds power-user tooling to web3 explorers.
+Chrome extension that adds power-user tooling to web3 explorers.
 
 ## Features
 
-| Feature | What it does |
-|---|---|
-| Transaction tool links | On a transaction page, adds `Open in` links that reopen the same transaction in **Tenderly**, **Dedaub** and **Phalcon**. Only tools that actually index the chain are offered, so there are no dead links; on a chain none of them cover, nothing is injected. |
+| Feature | Where | What it does |
+|---|---|---|
+| Transaction tool links | Blockscout | On a transaction page, adds `Open in` links that reopen the same transaction in **Tenderly**, **Dedaub** and **Phalcon**. Only tools that actually index the chain are offered, so there are no dead links; on a chain none of them cover, nothing is injected. |
+| Txn fee in USD | Etherscan | Appends the fiat value to every `Txn Fee` cell in a transaction table, permanently visible. Etherscan reveals USD on hover for the `Amount` column but never for the fee, even though it already knows the rate. |
 
 ```
 Transaction details   Open in  ( Tenderly ) ( Dedaub ) ( Phalcon )
+
+Txn Fee
+0.00001394 ETH | $0.03
 ```
 
 ## Supported explorers
 
-Any Blockscout frontend. The chain is detected at runtime, so a host does not need to be
-known ahead of time — only listed in `content_scripts.matches` so Chrome injects there.
+Two explorer families, one content script each, since they share no DOM.
+
+**Blockscout.** Any Blockscout frontend — the chain is detected at runtime, so a host needs
+no prior knowledge, only a `content_scripts.matches` entry so Chrome injects there.
 
 | Host | Covers |
 |---|---|
 | `*.blockscout.com` | ~50 public instances, mainnets and testnets |
 | `explorer.optimism.io` | OP Mainnet (10) — `optimism.blockscout.com` redirects here |
 | `gnosisscan.io` | Gnosis (100) — `gnosis.blockscout.com` redirects here |
+| `scrollscan.com` | Scroll (534352) — an Etherscan-branded domain now serving Blockscout |
+
+**Etherscan.** 27 zones, matched as `*.<zone>` so testnet subdomains work without a
+manifest edit: `etherscan.io`, `bscscan.com`, `polygonscan.com`, `basescan.org`,
+`arbiscan.io`, `lineascan.build`, `blastscan.io`, `snowscan.xyz`, `bttcscan.com`,
+`celoscan.io`, `fraxscan.com`, `mantlescan.xyz`, `sonicscan.org`, `uniscan.xyz`,
+`abscan.org`, `berascan.com`, `worldscan.org`, `apescan.io`, `taikoscan.io`,
+`xdcscan.com`, `monadscan.com`, `hyperevmscan.io`, `katanascan.com`, `seiscan.io`,
+`stablescan.xyz`, `plasmascan.to`, `memecorescan.io`.
+
+Deliberately excluded, each verified rather than assumed: `scrollscan.com`, `gnosisscan.io`
+and `nova.arbiscan.io` now serve Blockscout; `snowtrace.io` is Routescan; `cronoscan.com`
+was retired; `ftmscan.com` no longer resolves; `moonscan.io` stopped serving network data
+when Moonbeam entered maintenance mode.
 
 ## Install
 
@@ -42,7 +62,9 @@ request, which needs none.
 
 ## How it works
 
-`src/content/blockscout.ts` runs on the hosts listed above and, for each transaction page,
+### Blockscout: transaction tool links
+
+`src/content/blockscout.ts` runs on the Blockscout hosts and, for each transaction page,
 resolves the chain id and asks every tool for a URL.
 
 **Getting the transaction hash.** From `location.pathname` only — Blockscout's route is
@@ -67,6 +89,30 @@ matches the current hash — that check is also what stops the observer feeding 
 
 **Placement.** Anchored on `h1` (falling back to `[role="tablist"]`) because Blockscout's
 emotion class names (`css-1ysmdhs`) carry a build hash and change between releases.
+
+### Etherscan: txn fee in USD
+
+`src/content/etherscan.ts` annotates every `td.showTxnFee` cell it finds, so the same code
+covers address pages, `/txs` and block pages.
+
+**Getting the rate.** Etherscan's header carries `<div id="ethPrice">` reading
+`ETH Price: $2,501.04 (+2.33%) Gas: 5.527 Gwei`. That element is the only price the page
+exposes, and it yields both the rate and the native symbol — which is why this feature
+needs no chain registry and no network access. The id stays `ethPrice` on every fork, so
+the symbol has to come from the label text: polygonscan serves `POL Price: $0.12` from
+that same id. When the header has no usable price the pass does nothing; a guessed rate
+would be worse than none.
+
+**Not touching Gwei.** The `Txn Fee` header toggles the column between the fee and
+`td.showGasPrice`, which holds Gwei. Only `.showTxnFee` is ever annotated.
+
+**Staying correct.** Each cell is stamped with the fee and the exact rate used. A pass
+skips cells whose stamp matches and whose figure is still present, so a re-render or a
+moved rate re-renders rather than appending a second figure, and an idle pass writes
+nothing at all.
+
+**Sub-cent fees.** Cent precision would flatten most L2 fees to `$0.00`, so amounts under
+a cent fall back to two significant digits (`$0.00052`).
 
 ## Tool coverage
 
@@ -104,9 +150,11 @@ After a rebuild, press the reload button on the extension card in `chrome://exte
 
 ## Known limitations
 
-- Only Blockscout-based explorers are supported. Etherscan and its family use a different
-  DOM and expose no `/assets/envs.js`, so both the placement anchors and chain detection
-  would need their own implementation.
+- The two features do not overlap: tool links are Blockscout-only, the fee annotation is
+  Etherscan-only. Neither has been ported to the other family.
+- Some Etherscan hosts sit behind Cloudflare. On a `Just a moment...` challenge page none
+  of the expected elements exist and the script correctly does nothing; it annotates once
+  the real page loads.
 - A Blockscout instance on a host not in `content_scripts.matches` gets nothing. Adding one
   is a single entry in `src/manifest.json`; chain detection already works there.
 - Chain tables are snapshots, dated in each tool file. All three vendors add chains without

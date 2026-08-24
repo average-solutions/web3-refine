@@ -13,12 +13,13 @@ const SRC = join(ROOT, "src");
 const OUT = join(ROOT, "dist");
 
 /** Entrypoints, relative to `src`, that Chrome loads directly. */
-const ENTRYPOINTS = ["content/blockscout.ts"];
+const ENTRYPOINTS = ["content/blockscout.ts", "content/etherscan.ts"];
 
 /** Verbatim copies: `[path in src, path in dist]`. */
 const ASSETS: ReadonlyArray<readonly [string, string]> = [
   ["manifest.json", "manifest.json"],
   ["content/blockscout.css", "content/blockscout.css"],
+  ["content/etherscan.css", "content/etherscan.css"],
   ["icons", "icons"],
 ];
 
